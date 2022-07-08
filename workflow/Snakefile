@@ -1,0 +1,31 @@
+rule all:
+    input:
+        "data/processed/labels.csv",
+        "models/model.pth",
+        "model_test.jpg"
+
+rule predict_model:
+    input:
+        "data/raw/images/airplane_003.jpg",
+        "models/model.pth"
+    output:
+        directory("model_outputs")
+    shell:
+        "python -m src.models.predict_model {input[0]} {input[1]} {output} 0.8"
+
+rule train_model:
+    input:
+        "data/processed/labels.csv",
+    output:
+        "models/model.pth"
+    shell:
+        "python -m src.models.train_model {input} {output} 1 0.001"
+
+rule data_preprocess:
+    input:
+        "data/raw/"
+    output:
+        "data/processed/labels.csv",
+        directory("data/processed/train_img")
+    shell:
+        "python -m src.data.data_preprocess {input} {output[0]} {output[1]}"
